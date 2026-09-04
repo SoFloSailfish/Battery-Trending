@@ -1896,7 +1896,7 @@ const CSS = `
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bt-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
   background:var(--c-surface);border:1px solid var(--c-line);border-radius:12px;padding:13px 15px;
-  transition:.13s;font-family:inherit}
+  transition:.13s;font-family:inherit;color:var(--c-ink)}
 .bt-row:hover{border-color:var(--c-accent);transform:translateY(-1px);box-shadow:0 4px 14px rgba(20,40,50,.07)}
 .bt-dot{width:10px;height:10px;border-radius:50%;flex:none}
 .bt-row-main{flex:1;min-width:0}
