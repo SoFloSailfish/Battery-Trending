@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ReferenceLine, BarChart, Bar, Cell,
@@ -6,12 +6,102 @@ import {
 import {
   Battery, Plus, Download, Upload, ChevronLeft, AlertTriangle,
   Activity, Clock, DollarSign, Gauge, Settings, Trash2, Check,
-  FileSpreadsheet, X, Sun, Moon,
+  FileSpreadsheet, X, Sun, Moon, UploadCloud, Cloud, CloudOff, Key,
 } from "lucide-react";
 
 const SEED = [{"name":"Tower Pod","model":"NorthStar SBS190F","ah":190,"load":7.4,"ref":2405,"retail":660,"strings":1,"jarLabels":["Jar1","Jar2","Jar3","Jar4"],"jarCount":4,"conductance":[{"date":"2024-06-20","readings":[1884,1806,1710,1650]},{"date":"2024-12-27","readings":[2466,2370,2310,2160]},{"date":"2026-02-07","readings":[2508,2424,2394,2292]}],"voltage":[{"date":"2024-06-20","readings":[13.61,13.75,13.9,14.086]},{"date":"2024-12-27","readings":[13.624,13.683,13.662,13.987]}],"temperature":[{"date":"2024-06-20","readings":[69.8,69.8,69.8,69.8]},{"date":"2024-12-27","readings":[68,68,68,68]}]},{"name":"Six Mile","model":"DEKA 12AVR100ET","ah":100,"load":8,"ref":1253,"retail":460,"strings":1,"jarLabels":["Jar1","Jar2","Jar3","Jar4"],"jarCount":4,"conductance":[{"date":"2023-09-07","readings":[1140,1236,1146,1116]},{"date":"2024-06-24","readings":[1074,1140,1068,1110]},{"date":"2024-12-26","readings":[714,792,702,756]},{"date":"2026-02-07","readings":[510,588,480,522]}],"voltage":[{"date":"2023-09-07","readings":[12.833,12.804,12.821,12.844]},{"date":"2024-06-24","readings":[12.817,12.754,12.82,12.902]},{"date":"2024-12-26","readings":[12.524,12.46,12.526,12.607]}],"temperature":[{"date":"2023-09-07","readings":[69,69,69,69]},{"date":"2024-06-24","readings":[72,72,72,72]},{"date":"2024-12-26","readings":[72,72,72,72]}]},{"name":"Public Works","model":"DEKA 12AVR150ET","ah":150,"load":82.9,"ref":2049,"retail":520,"strings":6,"jarLabels":["Jar1-1","Jar1-2","Jar1-3","Jar1-4","Jar2-1","Jar2-2","Jar2-3","Jar2-4","Jar3-1","Jar3-2","Jar3-3","Jar3-4","Jar4-1","Jar4-2","Jar4-3","Jar4-4","Jar5-1","Jar5-2","Jar5-3","Jar5-4","Jar6-1","Jar6-2","Jar6-3","Jar6-4"],"jarCount":24,"conductance":[{"date":"2020-02-18","readings":[1986,1962,1956,2022,1920,1926,1938,1962,1980,1956,1962,1974,2004,1968,1962,1968,1986,1992,2046,2070,2034,2016,2070,2088]},{"date":"2023-09-07","readings":[1866,1818,1824,1908,1788,1794,1776,1800,1800,1806,1800,1794,1866,1824,1812,1806,1818,1836,1872,1872,1872,1884,1884,1914]},{"date":"2024-06-25","readings":[1728,1596,1644,1578,1638,1632,1554,1524,1626,1632,1500,1554,1596,1554,1512,1440,1602,1344,1626,1542,1272,1332,1248,1272]},{"date":"2024-12-27","readings":[1692,1560,1602,1560,1590,1578,1494,1482,1566,1566,1440,1506,1578,1518,1458,1428,1530,1302,1584,1494,1410,1794,1698,1662]},{"date":"2026-02-07","readings":[1614,1470,1506,1644,1530,1494,1404,1380,1470,1458,1320,1398,1476,1500,1386,1320,1518,1236,1560,1350,1590,1674,1590,1554]}],"voltage":[{"date":"2020-02-18","readings":[13.59,13.67,13.55,13.62,13.63,13.58,13.64,13.56,13.6,13.6,13.64,13.56,13.6,13.52,13.68,13.6,13.64,13.71,13.51,13.56,13.63,13.55,13.63,13.6]},{"date":"2023-09-07","readings":[13.58,13.723,13.638,13.89,13.64,13.62,13.75,13.85,13.63,13.63,13.779,13.8,13.59,13.51,13.84,13.9,13.61,13.797,13.648,13.83,13.638,13.58,13.76,13.883]},{"date":"2024-06-25","readings":[13.55,13.69,13.61,14.05,13.62,13.6,13.73,13.87,13.6,13.61,13.77,13.82,13.58,12.51,13.85,13.95,13.58,13.76,13.65,13.87,13.61,13.59,13.79,13.91]},{"date":"2024-12-27","readings":[13.553,13.69,13.597,14.013,13.587,13.611,13.721,13.834,13.577,13.625,13.783,13.798,13.575,13.507,13.824,13.965,13.314,13.791,13.664,13.859,13.592,13.573,13.767,13.974]}],"temperature":[{"date":"2020-02-18","readings":[70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5,70.5]},{"date":"2023-09-07","readings":[69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69,69]},{"date":"2024-06-25","readings":[79,79,79,79,81,81,81,81,79,79,79,79,79,79,79,79,79,79,79,79,79,79,79,79]},{"date":"2024-12-27","readings":[73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73]}]},{"name":"Admin East","model":"Enersys SBS190F","ah":190,"load":32,"ref":1918,"retail":null,"strings":2,"jarLabels":["Jar1-1","Jar1-2","Jar1-3","Jar1-4","Jar2-1","Jar2-2","Jar2-3","Jar2-4"],"jarCount":8,"conductance":[{"date":"2025-07-14","readings":[1920,1938,1902,1668,1872,1806,1734,1746]},{"date":"2025-10-03","readings":[2004,2010,1932,1812,2016,1926,1872,1776]}],"voltage":[],"temperature":[]},{"name":"JC Annex","model":"DEKA / NorthStar","ah":170,"load":117.1,"ref":2086,"stringRefs":[2086,2086,2086,2086,2086,2597,2597,2597,2597],"retail":580,"strings":9,"jarLabels":["Jar1-1","Jar1-2","Jar1-3","Jar1-4","Jar2-1","Jar2-2","Jar2-3","Jar2-4","Jar3-1","Jar3-2","Jar3-3","Jar3-4","Jar4-1","Jar4-2","Jar4-3","Jar4-4","Jar5-1","Jar5-2","Jar5-3","Jar5-4","Jar6-1","Jar6-2","Jar6-3","Jar6-4","Jar7-1","Jar7-2","Jar7-3","Jar7-4","Jar8-1","Jar8-2","Jar8-3","Jar8-4","Jar9-1","Jar9-2","Jar9-3","Jar9-4"],"jarCount":36,"conductance":[{"date":"2020-02-19","readings":[2106,2112,2118,2124,2100,2112,2106,2142,2130,2064,2088,2082,2004,2106,2004,2040,2070,2082,2100,2028,2562,2562,2538,2526,2598,2550,2562,2550,2622,2574,2676,2646,2616,2598,2670,2706]},{"date":"2023-09-06","readings":[1770,1320,1782,1794,1782,1782,1770,1752,1806,1752,1764,1776,1710,1776,1692,1740,1740,1764,1770,1746,2292,2298,2286,2004,2316,2238,2298,2265,1542,1806,2214,2010,1950,2376,2430,2436]},{"date":"2024-07-23","readings":[1524,1542,1494,1494,1596,1566,1542,1482,1578,1554,1542,1482,1536,1572,1464,1458,1536,1548,1536,1470,1632,2016,1698,1908,2340,2010,1758,1992,2268,1968,2142,2064,2202,2130,2178,1770]},{"date":"2024-12-27","readings":[1464,1524,1446,1494,1554,1536,1518,1446,1554,1524,1524,1464,1518,1524,1422,1434,1500,1548,1488,1446,1602,1980,2262,2058,2310,2232,1818,1956,1938,2214,2412,1866,2430,2298,2406,2070]}],"voltage":[],"temperature":[]},{"name":"Justice Center","model":"C&D AT-15P","ah":839,"load":150.4,"ref":2231,"retail":null,"strings":1,"jarLabels":["Jar1-1","Jar1-2","Jar1-3","Jar1-4","Jar1-5","Jar1-6","Jar1-7","Jar1-8","Jar1-9","Jar1-10","Jar1-11","Jar1-12","Jar1-13","Jar1-14","Jar1-15","Jar1-16","Jar1-17","Jar1-18","Jar1-19","Jar1-20","Jar1-21","Jar1-22","Jar1-23","Jar1-24"],"jarCount":24,"conductance":[{"date":"2025-07-15","readings":[2204,1992,2371,2164,2361,2174,2246,2218,2139,2143,2615,2213,2324,2296,2132,2073,2077,2064,1929,2210,2404,2185,2277,2284]},{"date":"2025-10-03","readings":[2229,1977,2423,2237,2380,2244,2412,2166,2220,1922,2377,2144,2405,2205,2072,2130,2250,2503,1951,2386,2099,2276,2360,2187]}],"voltage":[],"temperature":[]},{"name":"EOC","model":"Enersys SBS190F","ah":190,"load":55,"ref":2583,"retail":660,"strings":12,"jarLabels":["Jar1-1","Jar1-2","Jar1-3","Jar1-4","Jar2-1","Jar2-2","Jar2-3","Jar2-4","Jar3-1","Jar3-2","Jar3-3","Jar3-4","Jar4-1","Jar4-2","Jar4-3","Jar4-4","Jar5-1","Jar5-2","Jar5-3","Jar5-4","Jar6-1","Jar6-2","Jar6-3","Jar6-4","Jar7-1","Jar7-2","Jar7-3","Jar7-4","Jar8-1","Jar8-2","Jar8-3","Jar8-4","Jar9-1","Jar9-2","Jar9-3","Jar9-4","Jar10-1","Jar10-2","Jar10-3","Jar10-4","Jar11-1","Jar11-2","Jar11-3","Jar11-4","Jar12-1","Jar12-2","Jar12-3","Jar12-4"],"jarCount":48,"conductance":[{"date":"2023-04-26","readings":[2346,2760,2520,2718,2460,2604,2484,2574,2706,2592,2580,2544,2604,2556,2538,2736,2550,2682,2376,2718,2742,2772,2544,2694,2634,2646,2604,2454,2670,2442,2538,2514,2694,2670,2472,2622,2592,2658,2580,2478,2676,2604,2568,2670,2460,2460,2544,2550]},{"date":"2024-06-27","readings":[2082,2334,2040,2214,2154,2214,2124,2124,2178,2184,2148,2130,2142,2112,2100,2172,2082,2214,2016,2172,2262,2280,2106,2196,2130,2052,2202,2124,2178,2058,2136,1908,2232,2040,1914,2016,2094,2166,2286,1908,2190,2184,2178,2112,1938,1902,1908,2082]},{"date":"2024-12-26","readings":[2058,2238,2130,2082,2148,2292,2100,2196,2244,2250,2172,2124,2118,2118,2172,2376,2202,2232,2070,2184,2238,2388,2226,2316,2160,2160,2148,2226,2298,2178,2274,2124,2148,2238,2034,2172,2130,2292,2406,2064,2160,2178,2166,2196,2028,1926,2070,2148]}],"voltage":[],"temperature":[]},{"name":"ADMIN","model":"Enersys SBS190F","ah":190,"load":24.49,"ref":2092,"retail":null,"strings":2,"jarLabels":["Jar1-1","Jar1-2","Jar1-3","Jar1-4","Jar2-1","Jar2-2","Jar2-3","Jar2-4"],"jarCount":8,"conductance":[{"date":"2025-07-15","readings":[2148,2082,2010,1962,2112,2058,2202,2046]},{"date":"2025-10-03","readings":[2280,2142,1980,2010,2004,2130,2034,2160]}],"voltage":[],"temperature":[]},{"name":"TAX","model":"DEKA 12AVR150ET","ah":150,"load":55,"ref":2049,"retail":520,"strings":5,"jarLabels":["Jar1-1","Jar1-2","Jar1-3","Jar1-4","Jar2-1","Jar2-2","Jar2-3","Jar2-4","Jar3-1","Jar3-2","Jar3-3","Jar3-4","Jar4-1","Jar4-2","Jar4-3","Jar4-4","Jar5-1","Jar5-2","Jar5-3","Jar5-4"],"jarCount":20,"conductance":[{"date":"2020-02-18","readings":[1896,1932,1932,1926,1944,1914,1908,1926,1938,1938,1950,1920,1950,1914,1962,1962,1956,1956,1956,1950]},{"date":"2023-09-06","readings":[1506,1602,1602,1620,1572,1524,1470,1608,1590,1512,1560,1602,1530,1578,1568,1626,1434,1608,1608,1620]},{"date":"2024-07-23","readings":[1380,1500,1458,1494,1554,1374,1284,1482,1368,1278,1440,1308,1500,1332,1392,1446,1362,1452,1362,1464]},{"date":"2024-12-26","readings":[1236,1314,1290,1332,1368,1170,1092,1440,1218,1056,1230,1116,1320,1110,1188,1278,1128,1224,1164,1272]}],"voltage":[],"temperature":[]}];
 
-/* ---------- model / math ---------- */
+/* ---------- GitHub sync ----------
+ * The app's shared data lives in the repo at data/battery-data.json.
+ * READ: fetched from the public raw URL on startup — no token, every viewer
+ *       sees the latest published data automatically.
+ * WRITE: pushed via the GitHub Contents API using a personal access token that
+ *        the importer enters once (saved in this browser's localStorage).
+ */
+const GH_OWNER = "SoFloSailfish";
+const GH_REPO = "Battery-Trending";
+const GH_BRANCH = "main";
+const GH_DATA_PATH = "data/battery-data.json";
+const GH_TOKEN_KEY = "bt_github_token";
+
+// public raw URL for reading (cache-busted so viewers get fresh data)
+function ghRawUrl() {
+  return `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${GH_BRANCH}/${GH_DATA_PATH}?t=${Date.now()}`;
+}
+
+function getStoredToken() {
+  try { return localStorage.getItem(GH_TOKEN_KEY) || ""; } catch { return ""; }
+}
+function setStoredToken(t) {
+  try { if (t) localStorage.setItem(GH_TOKEN_KEY, t); else localStorage.removeItem(GH_TOKEN_KEY); } catch {}
+}
+
+// Read the shared data file. Returns { sites } or null if not present yet.
+async function ghFetchData() {
+  try {
+    const res = await fetch(ghRawUrl(), { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && Array.isArray(data.sites)) return data;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// Get the current file's SHA (needed to update an existing file via the API).
+async function ghGetSha(token) {
+  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_DATA_PATH}?ref=${GH_BRANCH}`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" },
+  });
+  if (res.status === 404) return null; // file doesn't exist yet
+  if (!res.ok) throw new Error(`GitHub read failed (${res.status})`);
+  const j = await res.json();
+  return j.sha || null;
+}
+
+// Publish the current sites to the repo. Returns { ok, error }.
+async function ghPublish(sites, token) {
+  if (!token) return { ok: false, error: "No token set." };
+  try {
+    const sha = await ghGetSha(token);
+    const body = {
+      version: 1,
+      updated: new Date().toISOString(),
+      sites,
+    };
+    // base64-encode the JSON (btoa needs binary-safe handling for UTF-8)
+    const json = JSON.stringify(body, null, 2);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_DATA_PATH}`;
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: `Update battery data ${new Date().toISOString().slice(0, 16).replace("T", " ")}`,
+        content: b64,
+        branch: GH_BRANCH,
+        ...(sha ? { sha } : {}),
+      }),
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      if (res.status === 401) return { ok: false, error: "Token rejected (401). Check the token is valid and has 'repo' or 'Contents: write' access." };
+      if (res.status === 404) return { ok: false, error: "Repo or path not found (404). Check the token has access to this repository." };
+      return { ok: false, error: `Publish failed (${res.status}). ${txt.slice(0, 120)}` };
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message || "Network error while publishing." };
+  }
+}
+
+
 const EOL = 0.8;            // 80% end-of-life derate
 const REPLACE_THRESHOLD = 0.8; // string health % at/under which a string is "due"
 const WEAK_JAR_THRESHOLD = 0.6; // any single jar at/under this flags the string regardless of average
@@ -430,6 +520,12 @@ function fmtDate(d) {
   if (isNaN(dt)) return d;
   return dt.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
+function fmtDateTime(iso) {
+  if (!iso) return "—";
+  const dt = new Date(iso);
+  if (isNaN(dt)) return "—";
+  return dt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
 function pct(v) { return v == null ? "—" : (v * 100).toFixed(1) + "%"; }
 function money(v) { return v == null ? "—" : "$" + Math.round(v).toLocaleString(); }
 function hrs(v) { return v == null ? "—" : v.toFixed(1) + " hr"; }
@@ -467,8 +563,46 @@ export default function BatteryTrending() {
   const [savedTick, setSavedTick] = useState(false);
   const [importData, setImportData] = useState(null); // parsed CSV awaiting confirm
   const [saveFallback, setSaveFallback] = useState(null); // {text, filename} when download is blocked
+  const [syncStatus, setSyncStatus] = useState("loading"); // loading | live | offline | local
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [tokenModal, setTokenModal] = useState(false);
+  const [publishState, setPublishState] = useState(null); // null | "publishing" | "done" | {error}
   const fileRef = useRef(null);
   const csvRef = useRef(null);
+
+  // On startup, load the shared data from the repo. Falls back to SEED if the
+  // file doesn't exist yet (first run) or the fetch fails (offline).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const data = await ghFetchData();
+      if (cancelled) return;
+      if (data && Array.isArray(data.sites)) {
+        setSites(data.sites.map((s) => ({ ...s, strings: s.strings || 1 })));
+        setLastUpdated(data.updated || null);
+        setSyncStatus("live");
+      } else {
+        // no shared file yet, or offline — keep the built-in seed
+        setSyncStatus("offline");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  async function publishData() {
+    const token = getStoredToken();
+    if (!token) { setTokenModal(true); return; }
+    setPublishState("publishing");
+    const result = await ghPublish(sites, token);
+    if (result.ok) {
+      setPublishState("done");
+      setLastUpdated(new Date().toISOString());
+      setSyncStatus("live");
+      setTimeout(() => setPublishState(null), 2500);
+    } else {
+      setPublishState({ error: result.error });
+    }
+  }
 
   const active = activeIdx != null ? sites[activeIdx] : null;
 
@@ -662,22 +796,39 @@ export default function BatteryTrending() {
           </div>
         </div>
         <div className="bt-actions">
+          <span className={"bt-syncpill " + syncStatus} title={
+            syncStatus === "live" ? (lastUpdated ? "Showing shared data · updated " + fmtDateTime(lastUpdated) : "Showing shared data")
+            : syncStatus === "loading" ? "Loading shared data…"
+            : "Showing built-in data (couldn't reach shared file)"
+          }>
+            {syncStatus === "live" ? <Cloud size={13} /> : syncStatus === "loading" ? <Cloud size={13} /> : <CloudOff size={13} />}
+            {syncStatus === "live" ? "Live" : syncStatus === "loading" ? "…" : "Offline"}
+          </span>
           <button className="bt-iconbtn-top" onClick={() => setDark((d) => !d)} title={dark ? "Switch to light mode" : "Switch to dark mode"} aria-label="Toggle theme">
             {dark ? <Sun size={17} /> : <Moon size={17} />}
           </button>
           <button className="bt-btn ghost" onClick={() => csvRef.current?.click()}>
             <FileSpreadsheet size={15} /> Import test
           </button>
-          <button className="bt-btn ghost" onClick={() => fileRef.current?.click()}>
-            <Upload size={15} /> Load
+          <button className="bt-btn" onClick={publishData} disabled={publishState === "publishing"} title="Publish current data so the whole team sees it">
+            {publishState === "publishing" ? <>Publishing…</>
+              : publishState === "done" ? <><Check size={15} /> Published</>
+              : <><UploadCloud size={15} /> Publish</>}
           </button>
-          <button className="bt-btn" onClick={saveFile}>
-            {savedTick ? <><Check size={15} /> Saved</> : <><Download size={15} /> Save</>}
+          <button className="bt-iconbtn-top" onClick={() => setTokenModal(true)} title="Set up publish access (GitHub token)" aria-label="Publish settings">
+            <Key size={15} />
           </button>
           <input ref={fileRef} type="file" accept=".json" hidden onChange={loadFile} />
           <input ref={csvRef} type="file" accept=".csv,text/csv" hidden onChange={loadCSV} />
         </div>
       </header>
+
+      {publishState && publishState.error && (
+        <div className="bt-publish-error">
+          <AlertTriangle size={15} /> {publishState.error}
+          <button onClick={() => setPublishState(null)}><X size={14} /></button>
+        </div>
+      )}
 
       {view === "fleet" && (
         <FleetView
@@ -754,6 +905,77 @@ export default function BatteryTrending() {
           </div>
         </div>
       )}
+
+      {tokenModal && (
+        <TokenModal
+          onClose={() => setTokenModal(false)}
+          onSaveLocal={saveFile}
+          onLoadLocal={() => fileRef.current?.click()}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ============================================================= TOKEN / SETTINGS MODAL */
+function TokenModal({ onClose, onSaveLocal, onLoadLocal }) {
+  const [token, setToken] = useState(getStoredToken());
+  const [saved, setSaved] = useState(false);
+  const hasToken = getStoredToken().length > 0;
+
+  function save() {
+    setStoredToken(token.trim());
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+  function clear() {
+    setStoredToken("");
+    setToken("");
+  }
+
+  return (
+    <div className="bt-modal-back" onClick={onClose}>
+      <div className="bt-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="bt-modal-h">
+          <h2>Publish access</h2>
+          <button className="bt-iconbtn" onClick={onClose}><X size={18} /></button>
+        </div>
+        <p className="bt-note">
+          To publish data for the whole team, paste a GitHub <b>personal access token</b> with
+          write access to this repository. It's stored only in this browser. Viewers don't need
+          one — they always see the latest published data automatically.
+        </p>
+        <div className="bt-field" style={{ marginTop: 12 }}>
+          <label>GitHub token {hasToken && <span className="bt-auto">saved</span>}</label>
+          <input
+            type="password"
+            value={token}
+            placeholder="ghp_… or github_pat_…"
+            onChange={(e) => setToken(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
+        <div className="bt-modal-actions" style={{ display: "flex", gap: 8 }}>
+          <button className="bt-btn" onClick={save} disabled={!token.trim()}>
+            {saved ? <><Check size={15} /> Saved</> : <><Key size={15} /> Save token</>}
+          </button>
+          {hasToken && <button className="bt-btn ghost-dark" onClick={clear}>Remove token</button>}
+        </div>
+
+        <div className="bt-modal-divider" />
+        <p className="bt-note">
+          <b>Local backup (optional).</b> You can also save or load a data file on this computer,
+          independent of the shared copy.
+        </p>
+        <div className="bt-modal-actions" style={{ display: "flex", gap: 8 }}>
+          <button className="bt-btn ghost-dark" onClick={() => { onSaveLocal(); }}>
+            <Download size={15} /> Save file
+          </button>
+          <button className="bt-btn ghost-dark" onClick={() => { onClose(); onLoadLocal(); }}>
+            <Upload size={15} /> Load file
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1021,8 +1243,8 @@ function FleetView({ sites, metrics, onOpen, onAddSite }) {
         <ResponsiveContainer width="100%" height={Math.max(180, sites.length * 34)}>
           <BarChart data={chartData} layout="vertical" margin={{ left: 8, right: 28, top: 4, bottom: 4 }}>
             <CartesianGrid horizontal={false} stroke="var(--c-grid)" />
-            <XAxis type="number" domain={[0, 110]} tickFormatter={(v) => v + "%"} stroke="var(--c-muted)" fontSize={11} />
-            <YAxis type="category" dataKey="name" width={92} stroke="var(--c-ink)" fontSize={11.5} />
+            <XAxis type="number" domain={[0, 110]} tickFormatter={(v) => v + "%"} stroke="var(--c-muted)" tick={{ fill: "var(--c-muted)" }} fontSize={11} />
+            <YAxis type="category" dataKey="name" width={92} stroke="var(--c-line)" tick={{ fill: "var(--c-ink)" }} fontSize={11.5} />
             <Tooltip
               cursor={{ fill: "rgba(0,0,0,0.03)" }}
               contentStyle={tipStyle}
@@ -1160,8 +1382,8 @@ function SiteView({ site, onBack, onEntry, onConfig }) {
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={trend} margin={{ left: 0, right: 16, top: 8, bottom: 4 }}>
                 <CartesianGrid stroke="var(--c-grid)" vertical={false} />
-                <XAxis dataKey="label" stroke="var(--c-muted)" fontSize={11} />
-                <YAxis domain={[0, 110]} tickFormatter={(v) => v + "%"} stroke="var(--c-muted)" fontSize={11} width={42} />
+                <XAxis dataKey="label" stroke="var(--c-muted)" tick={{ fill: "var(--c-muted)" }} fontSize={11} />
+                <YAxis domain={[0, 110]} tickFormatter={(v) => v + "%"} stroke="var(--c-muted)" tick={{ fill: "var(--c-muted)" }} fontSize={11} width={42} />
                 <Tooltip formatter={(v) => [v + "%", "String health"]} contentStyle={tipStyle} />
                 <ReferenceLine y={90} stroke="var(--c-good)" strokeDasharray="3 3" label={{ value: "90%", position: "right", fill: "var(--c-good)", fontSize: 9 }} />
                 <ReferenceLine y={60} stroke="var(--c-crit)" strokeDasharray="4 3" label={{ value: "Replace 60%", position: "right", fill: "var(--c-crit)", fontSize: 10 }} />
@@ -1177,8 +1399,8 @@ function SiteView({ site, onBack, onEntry, onConfig }) {
             <ResponsiveContainer width="100%" height={Math.max(160, jarBars.length * 13)}>
               <BarChart data={jarBars} layout="vertical" margin={{ left: 4, right: 24, top: 2, bottom: 2 }}>
                 <CartesianGrid horizontal={false} stroke="var(--c-grid)" />
-                <XAxis type="number" domain={[0, 120]} tickFormatter={(v) => v + "%"} stroke="var(--c-muted)" fontSize={10} />
-                <YAxis type="category" dataKey="label" width={62} stroke="var(--c-ink)" fontSize={10} interval={0} />
+                <XAxis type="number" domain={[0, 120]} tickFormatter={(v) => v + "%"} stroke="var(--c-muted)" tick={{ fill: "var(--c-muted)" }} fontSize={10} />
+                <YAxis type="category" dataKey="label" width={62} stroke="var(--c-line)" tick={{ fill: "var(--c-ink)" }} fontSize={10} interval={0} />
                 <Tooltip formatter={(v) => [v + "%", "Health"]} contentStyle={tipStyle} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
                 <ReferenceLine x={60} stroke="var(--c-crit)" strokeDasharray="2 2" label={{ value: "60%", position: "insideBottomLeft", fill: "var(--c-crit)", fontSize: 9 }} />
                 <Bar dataKey="health" radius={[0, 3, 3, 0]} barSize={9}>
@@ -1609,6 +1831,16 @@ const CSS = `
 .bt-title{font-weight:700;font-size:15px;letter-spacing:.2px}
 .bt-sub{font-size:11px;color:#8fb3b8;margin-top:1px;letter-spacing:.3px;text-transform:uppercase}
 .bt-actions{display:flex;gap:8px;align-items:center}
+.bt-syncpill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
+  padding:4px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.bt-syncpill.live{background:rgba(47,180,126,.15);color:#7fe0b4;border-color:rgba(47,180,126,.3)}
+.bt-syncpill.loading{background:rgba(255,255,255,.08);color:#b9c9d0}
+.bt-syncpill.offline{background:rgba(224,138,74,.15);color:#f0b088;border-color:rgba(224,138,74,.3)}
+.bt-publish-error{display:flex;align-items:center;gap:8px;max-width:860px;margin:10px auto 0;
+  padding:10px 14px;background:var(--c-crit-bg);border:1px solid var(--c-crit-line);color:var(--c-crit-ink);
+  border-radius:9px;font-size:13px}
+.bt-publish-error button{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--c-crit-ink);display:flex}
+.bt-modal-divider{height:1px;background:var(--c-line);margin:16px 0}
 .bt-iconbtn-top{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
   border:none;cursor:pointer;background:rgba(255,255,255,.10);color:#dfeef0;border-radius:8px;transition:.13s}
 .bt-iconbtn-top:hover{background:rgba(255,255,255,.18)}
