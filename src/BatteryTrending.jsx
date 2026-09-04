@@ -41,7 +41,10 @@ function setStoredToken(t) {
 // Read the shared data file from the raw CDN. Returns { sites, updated } or null.
 async function ghFetchData() {
   try {
-    const res = await fetch(ghRawUrl(), { cache: "no-store", headers: { "Cache-Control": "no-cache" } });
+    // Note: no custom headers here — a Cache-Control header would trigger a CORS
+    // preflight that raw.githubusercontent.com rejects. The ?t= timestamp in the
+    // URL is what defeats the CDN cache.
+    const res = await fetch(ghRawUrl(), { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     if (data && Array.isArray(data.sites)) return data;
